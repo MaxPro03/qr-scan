@@ -1,103 +1,74 @@
 <template>
-  <div>
+  <div class="qr-scanner">
+    <div class="qr-scanner-logo">
+      <img src="@/assets/images/gogo_logo.png" alt="" />
+    </div>
     <h1 v-if="isWiki">WIKIPEDIA</h1>
-    <p>
-      Modern mobile phones often have a variety of different cameras installed (e.g. front, rear, wide-angle, infrared,
-      desk-view). The one picked by default is sometimes not the best choice. If you want fine-grained control, which
-      camera is used, you can enumerate all installed cameras and then pick the one you need based on it's device ID:
-
-      <select v-model="selectedDevice">
-        <option v-for="device in devices" :key="device.label" :value="device">
-          {{ device.label }}
-        </option>
-      </select>
-    </p>
-
-    <!-- <p>
-      Detected codes are visually highlighted in real-time. Use the following dropdown to change the flavor:
-
-      <select v-model="trackFunctionSelected">
-        <option v-for="option in trackFunctionOptions" :key="option.text" :value="option">
-          {{ option.text }}
-        </option>
-      </select>
-    </p> -->
-
-    <p class="error">{{ error }}</p>
-
-    <p class="decode-result">
-      Last result: <b>{{ result }}</b>
-    </p>
-
-    <div class="qr-scan-container">
-      <div class="qr-scan-box">
-        <qrcode-stream
-          :constraints="{ deviceId: selectedDevice.deviceId, facingMode: 'environment' }"
-          :track="trackFunctionSelected.value"
-          :formats="['qr_code']"
-          @error="onError"
-          @detect="onDetect"
-          @camera-on="onReady"
-          @camera-off="onOff"
-          v-if="selectedDevice !== null">
-          <div class="qr-scan-border"></div>
-        </qrcode-stream>
-        <p v-else class="error">No cameras on this device</p>
+    <div v-if="cameraPermissionDenied" class="error">
+      Доступ к камере был запрещен. Пожалуйста, разрешите доступ в настройках браузера.
+      <div class="controls">
+        <button @click="requestCameraPermission">Запросить доступ к камере снова</button>
       </div>
     </div>
+
+    <div class="scanner-container" v-if="!cameraPermissionDenied">
+      <qrcode-stream
+        :constraints="selectedConstraints"
+        :track="paintOutline"
+        :formats="['qr_code']"
+        @decode="onDecode"
+        @detect="onDetect"
+        :facingMode="cameraFacingMode"
+        @camera-on="onCameraReady">
+      </qrcode-stream>
+    </div>
+
+    <!-- <div v-if="decodedUrl" class="result">
+      Результат:
+      <a :href="decodedUrl" target="_blank">{{ decodedUrl }}</a>
+    </div> -->
+
+    <!-- <div v-if="!decodedUrl" class="search-message">Пожалуйста, наведите камеру на QR-код.</div> -->
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+<script setup>
+import { ref, onMounted } from 'vue'
 import { QrcodeStream } from 'vue-qrcode-reader'
 
+const rearCameraSelected = ref(false)
+const frontCameraSelected = ref(false)
 const isWiki = ref(false)
+const decodedUrl = ref(null)
+const result = ref(null)
+const cameraPermissionDenied = ref(false)
+const cameraFacingMode = ref('environment') // По умолчанию используем заднюю камеру
+const defaultConstraintOptions = [
+  { label: 'rear camera', constraints: { facingMode: 'environment' } },
+  { label: 'front camera', constraints: { facingMode: 'user' } },
+]
+const constraintOptions = ref(defaultConstraintOptions)
+const selectedConstraints = ref({ facingMode: 'environment' })
 
-function onReady(capabilities) {
-  // hide loading indicator
-  console.log(capabilities)
-}
+// onMounted(() => {
+//   onCameraReady()
+// })
 
-function onOff(capabilities) {
-  // hide loading indicator
-  console.log(capabilities)
-}
-
-/*** detection handling ***/
-
-const result = ref('')
-
-function onDetect(detectedCodes) {
-  console.log(detectedCodes)
-  result.value = JSON.stringify(detectedCodes.map((code) => code.rawValue))
-  if (result.value.toLowerCase().includes('wikipedia')) {
-    isWiki.value = true
-  } else {
-    isWiki.value = false
-  }
-}
-
-/*** select camera ***/
-
-const selectedDevice = ref(null)
-const devices = ref([])
-
-onMounted(async () => {
-  devices.value = (await navigator.mediaDevices.enumerateDevices()).filter(({ kind }) => kind === 'videoinput')
-
-  if (devices.value.length > 0) {
-    selectedDevice.value = devices.value[1]
-  }
-})
-
-/*** track functons ***/
+// async function checkCameraPermission() {
+//   try {
+//     const result = await navigator.permissions.query({ name: 'camera' })
+//     cameraPermissionDenied.value = result.state === 'denied'
+//   } catch (error) {
+//     console.error('Ошибка при проверке разрешения камеры:', error)
+//     cameraPermissionDenied.value = true
+//   }
+// }
 
 function paintOutline(detectedCodes, ctx) {
   for (const detectedCode of detectedCodes) {
     const [firstPoint, ...otherPoints] = detectedCode.cornerPoints
 
-    ctx.strokeStyle = 'red'
+    ctx.strokeStyle = 'orange'
 
     ctx.beginPath()
     ctx.moveTo(firstPoint.x, firstPoint.y)
@@ -109,124 +80,159 @@ function paintOutline(detectedCodes, ctx) {
     ctx.stroke()
   }
 }
-function paintBoundingBox(detectedCodes, ctx) {
-  for (const detectedCode of detectedCodes) {
-    const {
-      boundingBox: { x, y, width, height },
-    } = detectedCode
 
-    ctx.lineWidth = 2
-    ctx.strokeStyle = '#007bff'
-    ctx.strokeRect(x, y, width, height)
-  }
+async function onCameraReady(capabilities) {
+  console.log('onCameraReady', capabilities)
+
+  // NOTE: on iOS we can't invoke `enumerateDevices` before the user has given
+  // camera access permission. `QrcodeStream` internally takes care of
+  // requesting the permissions. The `camera-on` event should guarantee that this
+  // has happened.
+  const devices = await navigator.mediaDevices.enumerateDevices()
+  const videoDevices = devices.filter(({ kind }) => kind === 'videoinput')
+  console.log('devices', devices)
+
+  constraintOptions.value = [
+    ...defaultConstraintOptions,
+    ...videoDevices.map(({ deviceId, label }) => ({
+      label: `${label} (ID: ${deviceId})`,
+      constraints: { deviceId },
+    })),
+  ]
+
+  console.log('constraintOptions', constraintOptions.value)
 }
-function paintCenterText(detectedCodes, ctx) {
-  for (const detectedCode of detectedCodes) {
-    const { boundingBox, rawValue } = detectedCode
 
-    const centerX = boundingBox.x + boundingBox.width / 2
-    const centerY = boundingBox.y + boundingBox.height / 2
+// async function requestCameraPermission() {
+//   try {
+//     await navigator.mediaDevices.getUserMedia({ video: true })
+//     cameraPermissionDenied.value = false
+//     console.log('Доступ к камере получен')
+//     checkCameraPermission()
+//   } catch (error) {
+//     if (error.name === 'NotAllowedError') {
+//       console.error('Ошибка: доступ к камере был отклонён.')
+//       alert('Доступ к камере был отклонён. Пожалуйста, измените настройки браузера.')
+//       cameraPermissionDenied.value = true
+//     } else {
+//       console.error('Ошибка при запросе доступа к камере:', error)
+//       cameraPermissionDenied.value = true
+//     }
+//   }
+// }
 
-    const fontSize = Math.max(12, (50 * boundingBox.width) / ctx.canvas.width)
-
-    ctx.font = `bold ${fontSize}px sans-serif`
-    ctx.textAlign = 'center'
-
-    ctx.lineWidth = 3
-    ctx.strokeStyle = '#35495e'
-    ctx.strokeText(detectedCode.rawValue, centerX, centerY)
-
-    ctx.fillStyle = '#5cb984'
-    ctx.fillText(rawValue, centerX, centerY)
-  }
-}
-const trackFunctionOptions = [
-  { text: 'nothing (default)', value: undefined },
-  { text: 'outline', value: paintOutline },
-  { text: 'centered text', value: paintCenterText },
-  { text: 'bounding box', value: paintBoundingBox },
-]
-const trackFunctionSelected = ref(trackFunctionOptions[1])
-
-/*** barcode formats ***/
-
-const barcodeFormats = ref({
-  aztec: false,
-  code_128: false,
-  code_39: false,
-  code_93: false,
-  codabar: false,
-  databar: false,
-  databar_expanded: false,
-  data_matrix: false,
-  dx_film_edge: false,
-  ean_13: false,
-  ean_8: false,
-  itf: false,
-  maxi_code: false,
-  micro_qr_code: false,
-  pdf417: false,
-  qr_code: true,
-  rm_qr_code: false,
-  upc_a: false,
-  upc_e: false,
-  linear_codes: false,
-  matrix_codes: false,
-})
-const selectedBarcodeFormats = computed(() => {
-  return Object.keys(barcodeFormats.value).filter((format) => barcodeFormats.value[format])
-})
-
-/*** error handling ***/
-
-const error = ref('')
-
-function onError(err) {
-  error.value = `[${err.name}]: `
-
-  if (err.name === 'NotAllowedError') {
-    error.value += 'you need to grant camera access permission'
-  } else if (err.name === 'NotFoundError') {
-    error.value += 'no camera on this device'
-  } else if (err.name === 'NotSupportedError') {
-    error.value += 'secure context required (HTTPS, localhost)'
-  } else if (err.name === 'NotReadableError') {
-    error.value += 'is the camera already in use?'
-  } else if (err.name === 'OverconstrainedError') {
-    error.value += 'installed cameras are not suitable'
-  } else if (err.name === 'StreamApiNotSupportedError') {
-    error.value += 'Stream API is not supported in this browser'
-  } else if (err.name === 'InsecureContextError') {
-    error.value += 'Camera access is only permitted in secure context. Use HTTPS or localhost rather than HTTP.'
+function onDetect(detectedCodes) {
+  console.log('detected', detectedCodes)
+  result.value = JSON.stringify(detectedCodes.map((code) => code.rawValue))
+  if (result.value.toLowerCase().includes('wikipedia')) {
+    isWiki.value = true
   } else {
-    error.value += err.message
+    isWiki.value = false
+  }
+}
+
+async function onInit(promise) {
+  console.log(promise)
+
+  try {
+    const { streams } = await promise
+    console.log('Доступные потоки камер:', streams)
+
+    const rearCamera = streams.find(
+      ({ device }) => device.kind === 'videoinput' && device.label.toLowerCase().includes('back')
+    )
+
+    if (rearCamera) {
+      rearCameraSelected.value = true
+      cameraFacingMode.value = 'environment' // Используем заднюю камеру
+    } else {
+      frontCameraSelected.value = streams.some(
+        ({ device }) => device.kind === 'videoinput' && device.label.toLowerCase().includes('front')
+      )
+      cameraFacingMode.value = frontCameraSelected.value ? 'user' : '' // Если передняя камера доступна, используем ее
+    }
+  } catch (error) {
+    console.error('Ошибка при инициализации камеры:', error)
+    cameraPermissionDenied.value = true
   }
 }
 </script>
 
 <style scoped>
+.qr-scanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Высота на всю высоту экрана */
+}
+
+.scanner-container {
+  position: relative;
+  width: 100%;
+  max-width: 300px; /* Максимальная ширина блока сканера */
+  aspect-ratio: 1; /* Соотношение сторон 1:1 */
+  overflow: hidden; /* Скрытие всего, что выходит за пределы контейнера */
+  border-radius: 15px; /* Скругление углов */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Тень для блока */
+}
+
+.result {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.result a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.result a:hover {
+  text-decoration: underline;
+}
+
+.search-message {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #555; /* Цвет сообщения для указания пользователя */
+}
+
 .error {
-  font-weight: bold;
+  max-width: 500px;
+  text-align: center;
+  display: grid;
+  gap: 10px;
   color: red;
 }
-.barcode-format-checkbox {
-  margin-right: 10px;
-  white-space: nowrap;
+
+.controls {
+  margin: 0 auto;
 }
-.qr-scan-box {
-  aspect-ratio: 1/1;
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.qr-scanner-logo {
   max-width: 300px;
-}
-.qr-scan-container {
   display: flex;
+  align-items: center;
   justify-content: center;
-  width: 100%;
+  position: absolute;
+  top: 50px;
 }
-/* .qr-scan-border {
-  aspect-ratio: 1/1;
-  max-width: 300px;
-  border: 10px solid black;
-  border-radius: 20px;
-  position: relative;
-} */
+
+.qr-scanner-logo img {
+  width: 100px;
+}
 </style>
