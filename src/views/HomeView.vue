@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <p>
+    <p>
       Modern mobile phones often have a variety of different cameras installed (e.g. front, rear, wide-angle, infrared,
       desk-view). The one picked by default is sometimes not the best choice. If you want fine-grained control, which
       camera is used, you can enumerate all installed cameras and then pick the one you need based on it's device ID:
@@ -10,7 +10,7 @@
           {{ device.label }}
         </option>
       </select>
-    </p> -->
+    </p>
 
     <!-- <p>
       Detected codes are visually highlighted in real-time. Use the following dropdown to change the flavor:
