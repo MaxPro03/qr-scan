@@ -3,7 +3,7 @@
     <div class="qr-scanner-logo">
       <img src="@/assets/images/gogo_logo.png" alt="" />
     </div>
-    <h1 v-if="isWiki">WIKIPEDIA</h1>
+    <h1>{{ result }}</h1>
     <div v-if="cameraPermissionDenied" class="error">
       Доступ к камере был запрещен. Пожалуйста, разрешите доступ в настройках браузера.
       <div class="controls">
