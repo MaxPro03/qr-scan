@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p>
+    <!-- <p>
       Modern mobile phones often have a variety of different cameras installed (e.g. front, rear, wide-angle, infrared,
       desk-view). The one picked by default is sometimes not the best choice. If you want fine-grained control, which
       camera is used, you can enumerate all installed cameras and then pick the one you need based on it's device ID:
@@ -10,9 +10,9 @@
           {{ device.label }}
         </option>
       </select>
-    </p>
+    </p> -->
 
-    <p>
+    <!-- <p>
       Detected codes are visually highlighted in real-time. Use the following dropdown to change the flavor:
 
       <select v-model="trackFunctionSelected">
@@ -20,17 +20,7 @@
           {{ option.text }}
         </option>
       </select>
-    </p>
-
-    <p>
-      By default only QR-codes are detected but a variety of other barcode formats are also supported. You can select
-      one or multiple but the more you select the more expensive scanning becomes: <br />
-
-      <span v-for="option in Object.keys(barcodeFormats)" :key="option" class="barcode-format-checkbox">
-        <input type="checkbox" v-model="barcodeFormats[option]" :id="option" />
-        <label :for="option">{{ option }}</label>
-      </span>
-    </p>
+    </p> -->
 
     <p class="error">{{ error }}</p>
 
@@ -42,7 +32,7 @@
       <qrcode-stream
         :constraints="{ deviceId: selectedDevice.deviceId }"
         :track="trackFunctionSelected.value"
-        :formats="selectedBarcodeFormats"
+        :formats="['qr_code']"
         @error="onError"
         @detect="onDetect"
         v-if="selectedDevice !== null" />
