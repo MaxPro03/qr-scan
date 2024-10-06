@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1 v-if="isWiki">WIKIPEDIA</h1>
     <p>
       Modern mobile phones often have a variety of different cameras installed (e.g. front, rear, wide-angle, infrared,
       desk-view). The one picked by default is sometimes not the best choice. If you want fine-grained control, which
@@ -28,15 +29,21 @@
       Last result: <b>{{ result }}</b>
     </p>
 
-    <div>
-      <qrcode-stream
-        :constraints="{ deviceId: selectedDevice.deviceId }"
-        :track="trackFunctionSelected.value"
-        :formats="['qr_code']"
-        @error="onError"
-        @detect="onDetect"
-        v-if="selectedDevice !== null" />
-      <p v-else class="error">No cameras on this device</p>
+    <div class="qr-scan-container">
+      <div class="qr-scan-box">
+        <qrcode-stream
+          :constraints="{ deviceId: selectedDevice.deviceId, facingMode: 'environment' }"
+          :track="trackFunctionSelected.value"
+          :formats="['qr_code']"
+          @error="onError"
+          @detect="onDetect"
+          @camera-on="onReady"
+          @camera-off="onOff"
+          v-if="selectedDevice !== null">
+          <div class="qr-scan-border"></div>
+        </qrcode-stream>
+        <p v-else class="error">No cameras on this device</p>
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +52,18 @@
 import { ref, computed, onMounted } from 'vue'
 import { QrcodeStream } from 'vue-qrcode-reader'
 
+const isWiki = ref(false)
+
+function onReady(capabilities) {
+  // hide loading indicator
+  console.log(capabilities)
+}
+
+function onOff(capabilities) {
+  // hide loading indicator
+  console.log(capabilities)
+}
+
 /*** detection handling ***/
 
 const result = ref('')
@@ -52,6 +71,11 @@ const result = ref('')
 function onDetect(detectedCodes) {
   console.log(detectedCodes)
   result.value = JSON.stringify(detectedCodes.map((code) => code.rawValue))
+  if (result.value.toLowerCase().includes('wikipedia')) {
+    isWiki.value = true
+  } else {
+    isWiki.value = false
+  }
 }
 
 /*** select camera ***/
@@ -63,7 +87,7 @@ onMounted(async () => {
   devices.value = (await navigator.mediaDevices.enumerateDevices()).filter(({ kind }) => kind === 'videoinput')
 
   if (devices.value.length > 0) {
-    selectedDevice.value = devices.value[0]
+    selectedDevice.value = devices.value[1]
   }
 })
 
@@ -189,4 +213,20 @@ function onError(err) {
   margin-right: 10px;
   white-space: nowrap;
 }
+.qr-scan-box {
+  aspect-ratio: 1/1;
+  max-width: 300px;
+}
+.qr-scan-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+/* .qr-scan-border {
+  aspect-ratio: 1/1;
+  max-width: 300px;
+  border: 10px solid black;
+  border-radius: 20px;
+  position: relative;
+} */
 </style>
