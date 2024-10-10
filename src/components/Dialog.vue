@@ -43,9 +43,8 @@ export default {
 .dialog-container {
   background: white;
   padding: 20px;
-  margin: 40px;
   border-radius: 10px;
-  max-width: 400px;
+  max-width: 250px;
   width: 100%;
   text-align: center;
   animation: slideUp 0.3s ease-out;
