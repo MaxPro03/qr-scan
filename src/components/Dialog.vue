@@ -31,7 +31,8 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  transform: translate(-50%, -50%);
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
@@ -48,6 +49,10 @@ export default {
   text-align: center;
   animation: slideUp 0.3s ease-out;
   font-family: sans-serif;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .dialog-button {
@@ -71,15 +76,6 @@ export default {
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-  }
-  to {
-    transform: translateY(0);
   }
 }
 </style>

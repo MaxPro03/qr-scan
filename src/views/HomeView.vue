@@ -88,7 +88,7 @@ const selectedConstraints = ref({ facingMode: 'environment' })
 // }
 const loading = ref(false)
 const errorMessage = ref('')
-const successMessage = ref('')
+const successMessage = ref('ttest')
 
 const sendPostRequest = async (id) => {
   loading.value = true
