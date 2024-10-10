@@ -12,16 +12,24 @@
     </div>
 
     <div class="scanner-container" v-if="!cameraPermissionDenied">
-      <qrcode-stream
+      <QrcodeStream
         :constraints="selectedConstraints"
         :track="paintOutline"
         :formats="['qr_code']"
-        @decode="onDecode"
         @detect="onDetect"
         :facingMode="cameraFacingMode"
         @camera-on="onCameraReady">
-      </qrcode-stream>
+      </QrcodeStream>
     </div>
+
+    <!-- Loader -->
+    <div v-if="loading" class="loader">Загрузка...</div>
+
+    <!-- Error Dialog -->
+    <Dialog v-if="errorMessage" :title="'Ошибка!'" :message="errorMessage" @close="closeErrorDialog" />
+
+    <!-- Success Dialog -->
+    <Dialog v-if="successMessage" :title="'Успешно!'" :message="successMessage" @close="closeSuccessDialog" />
 
     <!-- <div v-if="decodedUrl" class="result">
       Результат:
@@ -33,12 +41,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
 import { QrcodeStream } from 'vue-qrcode-reader'
-
+import Dialog from '@/components/Dialog.vue'
+import { ref, onMounted } from 'vue'
 const rearCameraSelected = ref(false)
 const frontCameraSelected = ref(false)
-const isWiki = ref(false)
 const decodedUrl = ref(null)
 const result = ref(null)
 const cameraPermissionDenied = ref(false)
@@ -49,6 +56,72 @@ const defaultConstraintOptions = [
 ]
 const constraintOptions = ref(defaultConstraintOptions)
 const selectedConstraints = ref({ facingMode: 'environment' })
+
+// Реактивные переменные для состояний
+// const loading = ref(false)
+// const errorMessage = ref(null)
+// const successMessage = ref(null)
+
+// Функция для отправки POST запроса
+// const submitForm = async (id) => {
+//   loading.value = true
+//   errorMessage.value = null
+//   successMessage.value = null
+
+//   try {
+//     const response = await fetch(`https://admin.gogomarket.uz/api/v2/order/confirm-order-delivery?id=${id}`, {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//     })
+
+//     if (!response.ok) {
+//       throw new Error('Failed to submit form.')
+//     }
+
+//     const result = await response.json()
+//     successMessage.value = `Success: ${result.message}`
+//   } catch (error) {
+//     errorMessage.value = error.message
+//   } finally {
+//     loading.value = false
+//   }
+// }
+const loading = ref(false)
+const errorMessage = ref('')
+const successMessage = ref('')
+
+const sendPostRequest = async (id) => {
+  loading.value = true
+  errorMessage.value = ''
+  successMessage.value = ''
+
+  try {
+    const response = await fetch(`https://admin.gogomarket.uz/api/v2/order/confirm-order-delivery?id=${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error('Ошибка. попробуйте снова')
+    }
+
+    successMessage.value = 'Успешно'
+  } catch (error) {
+    errorMessage.value = error.message
+  } finally {
+    loading.value = false
+  }
+}
+
+const closeErrorDialog = () => {
+  errorMessage.value = ''
+}
+
+const closeSuccessDialog = () => {
+  successMessage.value = ''
+}
 
 // onMounted(() => {
 //   onCameraReady()
@@ -121,14 +194,12 @@ async function onCameraReady(capabilities) {
 //   }
 // }
 
-function onDetect(detectedCodes) {
-  console.log('detected', detectedCodes)
-  result.value = JSON.stringify(detectedCodes.map((code) => code.rawValue))
-  if (result.value.toLowerCase().includes('wikipedia')) {
-    isWiki.value = true
-  } else {
-    isWiki.value = false
-  }
+async function onDetect(detectedCodes) {
+  console.log('detected', detectedCodes[0].rawValue)
+  result.value = await JSON.stringify(detectedCodes.map((code) => code.rawValue))
+  // detectedCodes.map((code) => code.rawValue)
+  sendPostRequest(detectedCodes[0].rawValue)
+  // console.log('detected', result.value)
 }
 
 async function onInit(promise) {
@@ -234,5 +305,9 @@ button:hover {
 
 .qr-scanner-logo img {
   width: 100px;
+}
+
+.loader {
+  margin-top: 20px;
 }
 </style>
