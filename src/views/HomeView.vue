@@ -15,12 +15,14 @@
       <QrcodeStream
         :constraints="selectedConstraints"
         :track="paintOutline"
-        :formats="['qr_code']"
+        :formats="['qr_code', 'code_128']"
         @detect="onDetect"
         :facingMode="cameraFacingMode"
         @camera-on="onCameraReady">
       </QrcodeStream>
     </div>
+
+    {{result}}
 
     <!-- Loader -->
     <div v-if="loading" class="loader">Загрузка...</div>
