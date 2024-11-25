@@ -1,0 +1,85 @@
+<script setup lang="ts">
+import { useRoute } from "vue-router";
+import UiProductCard from "@/components/order/UiProductCard.vue";
+import UiBadge from "@/components/order/UiBadge.vue";
+import {ref} from "vue";
+import UiInfoBlock from "@/components/order/UiInfoBlock.vue";
+
+const route = useRoute()
+
+const products = ref([
+  {
+    id: 1,
+    status: 1,
+    count: 12,
+    name: 'Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг',
+    image: '/images/watch.png'
+  },
+  {
+    id: 2,
+    status: 2,
+    count: 12,
+    name: 'Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг',
+    image: '/images/fan.png'
+  },
+  {
+    id: 3,
+    status: 1,
+    count: 12,
+    name: 'Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг',
+    image: '/images/new-qr.png'
+  },
+])
+
+const infoBlocks = ref([
+  {
+    id: 1,
+    name: 'Apple Store Malika B29',
+    description: 'Ташкент, Юнусабад-14, д.30 кв. 28, этаж 2',
+  },
+  {
+    id: 2,
+    name: 'Technoshop Market',
+    description: 'Ташкент, Юнусабад-14, д.30 кв. 28, этаж 2',
+  },
+])
+
+</script>
+
+<template>
+  <div class="container max-w-[calc(100%-20px)] mx-auto relative mb-32">
+    <div>
+      <RouterLink class="rounded-2xl bg-white p-2.5 flex items-center cursor-pointer mt-5 mb-2.5" to="/">
+        <img class="ml-2.5 rotate-180" src="@/assets/images/arrow-right.svg" alt="">
+        <div class="grid gap-1 w-full justify-center text-center -ml-4">
+          <h1 class="text-primary">
+            Заказ № {{ route.params.id }}
+          </h1>
+          <span class="text-secondary text-xs font-light">Товаров</span>
+        </div>
+      </RouterLink>
+      <div class="bg-white px-4 py-2.5 rounded-2xl">
+        <div class="py-2.5 mb-2.5 flex justify-between items-center">
+          <UiBadge color="yellow">В процессе сборки</UiBadge>
+          <span class="text-sm font-light">Собрано 1 из 3</span>
+        </div>
+        <div v-for="item in products" :key="item.id" class="border-t">
+          <UiProductCard :product="item"></UiProductCard>
+        </div>
+      </div>
+      <div class="grid gap-[5px] mt-2.5">
+        <UiInfoBlock v-for="item in infoBlocks" :key="item.id" :info="item"></UiInfoBlock>
+      </div>
+    </div>
+    <div class="qr-scan-button-container">
+      <RouterLink class="qr-scan-button" to="/qr-scan">
+        <img src="@/assets/images/qr-scan.svg" alt="">
+        <span class="font-medium text-lg">Принят товар</span>
+      </RouterLink>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+
+</style>
