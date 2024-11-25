@@ -1,107 +1,111 @@
 <script setup>
-import { ref } from "vue";
-import UiOrderCard from "@/components/order/UiOrderCard.vue";
-
-const orders = ref([
-  {
-    id: 123,
-    number: '725',
-    status: 1,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: '724',
-    status: 1,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: '723',
-    status: 2,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: '722',
-    status: 2,
-    count: 6,
-  },
-  {
-    id: 123,
-    number: '721',
-    status: 2,
-    count: 3,
-  },
-])
+// import { ref } from "vue";
+// import UiOrderCard from "@/components/order/UiOrderCard.vue";
+//
+// const orders = ref([
+//   {
+//     id: 123,
+//     number: '725',
+//     status: 1,
+//     count: 12,
+//   },
+//   {
+//     id: 123,
+//     number: '724',
+//     status: 1,
+//     count: 12,
+//   },
+//   {
+//     id: 123,
+//     number: '723',
+//     status: 2,
+//     count: 12,
+//   },
+//   {
+//     id: 123,
+//     number: '722',
+//     status: 2,
+//     count: 6,
+//   },
+//   {
+//     id: 123,
+//     number: '721',
+//     status: 2,
+//     count: 3,
+//   },
+// ])
+import HomeStorageView from "@/views/HomeStorageView.vue"
+import HomeClientView from "@/views/HomeClientView.vue"
 </script>
 
 <template>
-  <div class="container max-w-[calc(100%-20px)] mx-auto relative mb-32">
-    <img class="max-w-[224px] my-5 mx-auto" src="@/assets/images/logo.svg" alt="">
-    <div>
-      <h2 class="font-medium text-lg mb-2.5">Заказы</h2>
-      <div class="grid gap-[5px]">
-        <RouterLink :to="{name: 'order', params: { id: item.number } }" v-for="item in orders">
-          <UiOrderCard :order-info="item" />
-        </RouterLink>
-      </div>
-    </div>
-    <div class="qr-scan-button-container">
-      <RouterLink class="qr-scan-button" to="/qr-scan">
-        <img src="@/assets/images/qr-scan.svg" alt="">
-        <span class="font-medium text-lg">Принят товар</span>
-      </RouterLink>
-    </div>
-    <!--    <div>-->
-    <!--      <p>User ID: {{ userId }}</p>-->
-    <!--      <p>Username: {{ username }}</p>-->
-    <!--      <p v-if="chatId">Chat ID: {{ chatId }}</p>-->
-    <!--      <p v-else>Chat ID не доступен</p>-->
-    <!--    </div>-->
-    <!--    <RouterView />-->
-  </div>
+  <!--  <HomeStorageView />-->
+  <HomeClientView />
+  <!--  <div class="container max-w-[calc(100%-20px)] mx-auto relative mb-32">-->
+  <!--    <img class="max-w-[224px] my-5 mx-auto" src="@/assets/images/logo.svg" alt="">-->
+  <!--    <div>-->
+  <!--      <h2 class="font-medium text-lg mb-2.5">Заказы</h2>-->
+  <!--      <div class="grid gap-[5px]">-->
+  <!--        <RouterLink :to="{name: 'order', params: { id: item.number } }" v-for="item in orders">-->
+  <!--          <UiOrderCard :order-info="item" />-->
+  <!--        </RouterLink>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--    <div class="qr-scan-button-container">-->
+  <!--      <RouterLink class="qr-scan-button" to="/qr-scan">-->
+  <!--        <img src="@/assets/images/qr-scan.svg" alt="">-->
+  <!--        <span class="font-medium text-lg">Принят товар</span>-->
+  <!--      </RouterLink>-->
+  <!--    </div>-->
+  <!--    <div>-->
+  <!--      <p>User ID: {{ userId }}</p>-->
+  <!--      <p>Username: {{ username }}</p>-->
+  <!--      <p v-if="chatId">Chat ID: {{ chatId }}</p>-->
+  <!--      <p v-else>Chat ID не доступен</p>-->
+  <!--    </div>-->
+  <!--    <RouterView />-->
+  <!--  </div>-->
   <!--  <div class="qr-scanner">-->
-<!--    <div class="qr-scanner-logo">-->
-<!--      <img src="@/assets/images/gogo_logo.png" alt="" />-->
-<!--    </div>-->
-    <!-- <h1>{{ result }}</h1> -->
-<!--    <div v-if="cameraPermissionDenied" class="error">-->
-<!--      Доступ к камере был запрещен. Пожалуйста, разрешите доступ в настройках браузера.-->
-<!--      <div class="controls">-->
-<!--        <button @click="requestCameraPermission">Запросить доступ к камере снова</button>-->
-<!--      </div>-->
-<!--    </div>-->
+  <!--    <div class="qr-scanner-logo">-->
+  <!--      <img src="@/assets/images/gogo_logo.png" alt="" />-->
+  <!--    </div>-->
+  <!-- <h1>{{ result }}</h1> -->
+  <!--    <div v-if="cameraPermissionDenied" class="error">-->
+  <!--      Доступ к камере был запрещен. Пожалуйста, разрешите доступ в настройках браузера.-->
+  <!--      <div class="controls">-->
+  <!--        <button @click="requestCameraPermission">Запросить доступ к камере снова</button>-->
+  <!--      </div>-->
+  <!--    </div>-->
 
-<!--    <div class="scanner-container" v-if="!cameraPermissionDenied">-->
-<!--      <QrcodeStream-->
-<!--        :constraints="selectedConstraints"-->
-<!--        :track="paintOutline"-->
-<!--        :formats="['qr_code', 'code_128']"-->
-<!--        @detect="onDetect"-->
-<!--        :facingMode="cameraFacingMode"-->
-<!--        @camera-on="onCameraReady">-->
-<!--      </QrcodeStream>-->
-<!--    </div>-->
+  <!--    <div class="scanner-container" v-if="!cameraPermissionDenied">-->
+  <!--      <QrcodeStream-->
+  <!--        :constraints="selectedConstraints"-->
+  <!--        :track="paintOutline"-->
+  <!--        :formats="['qr_code', 'code_128']"-->
+  <!--        @detect="onDetect"-->
+  <!--        :facingMode="cameraFacingMode"-->
+  <!--        @camera-on="onCameraReady">-->
+  <!--      </QrcodeStream>-->
+  <!--    </div>-->
 
-<!--    {{result}}-->
+  <!--    {{result}}-->
 
-    <!-- Loader -->
-<!--    <div v-if="loading" class="loader">Загрузка...</div>-->
+  <!-- Loader -->
+  <!--    <div v-if="loading" class="loader">Загрузка...</div>-->
 
-    <!-- Error Dialog -->
-<!--    <Dialog v-if="errorMessage" :title="'Ошибка!'" :message="errorMessage" @close="closeErrorDialog" />-->
+  <!-- Error Dialog -->
+  <!--    <Dialog v-if="errorMessage" :title="'Ошибка!'" :message="errorMessage" @close="closeErrorDialog" />-->
 
-    <!-- Success Dialog -->
-<!--    <Dialog v-if="successMessage" :title="'Успешно!'" :message="successMessage" @close="closeSuccessDialog" />-->
+  <!-- Success Dialog -->
+  <!--    <Dialog v-if="successMessage" :title="'Успешно!'" :message="successMessage" @close="closeSuccessDialog" />-->
 
-    <!-- <div v-if="decodedUrl" class="result">
-      Результат:
-      <a :href="decodedUrl" target="_blank">{{ decodedUrl }}</a>
-    </div> -->
+  <!-- <div v-if="decodedUrl" class="result">
+    Результат:
+    <a :href="decodedUrl" target="_blank">{{ decodedUrl }}</a>
+  </div> -->
 
-    <!-- <div v-if="!decodedUrl" class="search-message">Пожалуйста, наведите камеру на QR-код.</div> -->
-<!--  </div>-->
+  <!-- <div v-if="!decodedUrl" class="search-message">Пожалуйста, наведите камеру на QR-код.</div> -->
+  <!--  </div>-->
 </template>
 
 <!--<script setup>-->
@@ -294,28 +298,28 @@ const orders = ref([
 <!--}-->
 <!--</script>-->
 
-<style>
-.qr-scan-button-container {
-  width: 100%;
-  height: 140px;
-  background: linear-gradient(to bottom, rgb(238, 242, 245, 0), rgb(225, 233, 238, 1));
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.qr-scan-button {
-  width: calc(100% - 20px);
-  margin: 34px auto 0 auto;
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  background-color: #FFFFFF;
-  border-radius: 16px;
-}
-</style>
+<!--<style>-->
+<!--.qr-scan-button-container {-->
+<!--  width: 100%;-->
+<!--  height: 140px;-->
+<!--  background: linear-gradient(to bottom, rgb(238, 242, 245, 0), rgb(225, 233, 238, 1));-->
+<!--  position: fixed;-->
+<!--  bottom: 0;-->
+<!--  left: 50%;-->
+<!--  transform: translateX(-50%);-->
+<!--}-->
+<!--.qr-scan-button {-->
+<!--  width: calc(100% - 20px);-->
+<!--  margin: 34px auto 0 auto;-->
+<!--  padding: 15px;-->
+<!--  display: flex;-->
+<!--  align-items: center;-->
+<!--  justify-content: center;-->
+<!--  gap: 15px;-->
+<!--  background-color: #FFFFFF;-->
+<!--  border-radius: 16px;-->
+<!--}-->
+<!--</style>-->
 
 <!--<style scoped>-->
 <!--.qr-scanner {-->
