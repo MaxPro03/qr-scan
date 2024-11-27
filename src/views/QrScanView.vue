@@ -21,7 +21,7 @@ const selectedConstraints = ref({ facingMode: "environment" })
 const cameraFacingMode = ref("environment") // По умолчанию используем заднюю камеру
 const defaultConstraintOptions = [
   { label: "rear camera", constraints: { facingMode: "environment" } },
-  { label: "front camera", constraints: { facingMode: "user" } },
+  // { label: "front camera", constraints: { facingMode: "user" } },
 ]
 const constraintOptions = ref(defaultConstraintOptions)
 const torchActive = ref(false)

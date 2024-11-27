@@ -3,6 +3,10 @@ import { RouterView } from "vue-router"
 import { onMounted, ref } from "vue"
 import { useTelegram } from "./utils/composable/useTelegram.ts"
 import UiOrderCard from "@/components/order/UiOrderCard.vue"
+import { useApi } from "@/utils/composable/useApi"
+import { useGlobalStore } from "./stores/global"
+
+const globalStore = useGlobalStore()
 
 const { tg } = useTelegram()
 
@@ -43,14 +47,15 @@ const orders = ref([
   },
 ])
 
-onMounted(() => {
-  tg?.lockOrientation()
-})
+// onMounted(() => {
+//   tg?.lockOrientation()
+// })
 </script>
 
 <template>
   <div id="app">
     <div>
+      <!--      {{ globalStore.TELEGRAM_BOT_ID }}-->
       <!--          <button @click="tg?.addToHomeScreen()">Добавить на главный экран</button>-->
       <p>User ID: {{ userId }}</p>
       <p>Username: {{ username }}</p>

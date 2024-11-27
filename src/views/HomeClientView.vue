@@ -1,6 +1,10 @@
 <script setup>
-import { computed, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import UiOrderCard from "@/components/order/UiOrderCard.vue"
+import { useApi } from "@/utils/composable/useApi.ts"
+import { useTelegram } from "@/utils/composable/useTelegram"
+
+const { tg } = useTelegram()
 
 // Определение фильтров
 const filters = ref([
@@ -24,38 +28,21 @@ const filteredItems = computed(() => {
   return orders.value.filter((item) => item.status === selectedFilter.value)
 })
 
-const orders = ref([
-  {
-    id: 123,
-    number: "725",
-    status: 3,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: "724",
-    status: 3,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: "723",
-    status: 4,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: "722",
-    status: 4,
-    count: 6,
-  },
-  {
-    id: 123,
-    number: "721",
-    status: 4,
-    count: 3,
-  },
-])
+const orders = ref([])
+
+const { data, error, loading, fetchData } = useApi(
+  "/v1/telegram-bot/get-orders",
+)
+
+onMounted(async () => {
+  // Запрашиваем данные при монтировании компонента
+  await fetchData({
+    telegram_user_id: tg?.initDataUnsafe?.user?.id,
+    page: 1,
+    size: 5,
+  })
+  orders.value = data.value.data.orders
+})
 </script>
 
 <template>
@@ -82,19 +69,19 @@ const orders = ref([
       </div>
       <div class="grid gap-[5px]">
         <RouterLink
-          :to="{ name: 'order', params: { id: item.number } }"
+          :to="{ name: 'clientOrder', params: { id: item.id } }"
           v-for="item in filteredItems"
         >
           <UiOrderCard :order-info="item" />
         </RouterLink>
       </div>
     </div>
-    <div class="qr-scan-button-container">
-      <RouterLink class="qr-scan-button" to="/qr-scan">
-        <img src="@/assets/images/qr-scan.svg" alt="" />
-        <span class="font-medium text-lg">Забрать заказ</span>
-      </RouterLink>
-    </div>
+    <!--    <div class="qr-scan-button-container">-->
+    <!--      <RouterLink class="qr-scan-button" to="/qr-scan">-->
+    <!--        <img src="@/assets/images/qr-scan.svg" alt="" />-->
+    <!--        <span class="font-medium text-lg">Забрать заказ</span>-->
+    <!--      </RouterLink>-->
+    <!--    </div>-->
   </div>
 </template>
 

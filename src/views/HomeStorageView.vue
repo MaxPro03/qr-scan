@@ -1,53 +1,76 @@
 <script setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import UiOrderCard from "@/components/order/UiOrderCard.vue"
+import { useApi } from "@/utils/composable/useApi.ts"
+import { useTelegram } from "@/utils/composable/useTelegram"
+
+const { tg } = useTelegram()
 
 const orders = ref([
-  {
-    id: 123,
-    number: "725",
-    status: 1,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: "724",
-    status: 1,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: "723",
-    status: 2,
-    count: 12,
-  },
-  {
-    id: 123,
-    number: "722",
-    status: 2,
-    count: 6,
-  },
-  {
-    id: 123,
-    number: "721",
-    status: 2,
-    count: 3,
-  },
+  // {
+  //   id: 123,
+  //   number: "725",
+  //   status: 1,
+  //   count: 12,
+  // },
+  // {
+  //   id: 123,
+  //   number: "724",
+  //   status: 1,
+  //   count: 12,
+  // },
+  // {
+  //   id: 123,
+  //   number: "723",
+  //   status: 2,
+  //   count: 12,
+  // },
+  // {
+  //   id: 123,
+  //   number: "722",
+  //   status: 2,
+  //   count: 6,
+  // },
+  // {
+  //   id: 123,
+  //   number: "721",
+  //   status: 2,
+  //   count: 3,
+  // },
 ])
+
+const { data, error, loading, fetchData } = useApi(
+  "/v1/telegram-bot/get-stores",
+)
+
+onMounted(async () => {
+  // Запрашиваем данные при монтировании компонента
+  await fetchData({
+    telegram_user_id: tg?.initDataUnsafe?.user?.id,
+    page: 1,
+    size: 5,
+  })
+  orders.value = data.value.data.data
+})
 </script>
 
 <template>
   <div class="container max-w-[calc(100%-20px)] mx-auto relative mb-32">
+    <!--    <div-->
+    <!--      class="rounded-2xl bg-white p-4 flex gap-3 justify-between items-center"-->
+    <!--    >-->
+    <!--      <img src="" alt="" />-->
+    <!--    </div>-->
     <img
       class="max-w-[224px] my-5 mx-auto"
       src="@/assets/images/logo.svg"
       alt=""
     />
     <div>
-      <h2 class="font-medium text-lg mb-2.5">Заказы</h2>
+      <h2 class="font-medium text-lg mb-2.5">Магазины</h2>
       <div class="grid gap-[5px]">
         <RouterLink
-          :to="{ name: 'order', params: { id: item.number } }"
+          :to="{ name: 'storageOrder', params: { id: item.id } }"
           v-for="item in orders"
         >
           <UiOrderCard :order-info="item" />

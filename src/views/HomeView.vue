@@ -36,11 +36,34 @@
 // ])
 import HomeStorageView from "@/views/HomeStorageView.vue"
 import HomeClientView from "@/views/HomeClientView.vue"
+import { useApi } from "@/utils/composable/useApi.ts"
+import { onMounted, ref } from "vue"
+import { useTelegram } from "@/utils/composable/useTelegram"
+
+const { tg } = useTelegram()
+
+//    Складовщик - принимает товары на складе
+const ROLE_WAREHOUSE = ref(false)
+
+//    Курьер - забирает товары у продавцов
+const ROLE_COURIER = ref(false)
+
+//    Доставщик - доставляет товары клиентам
+const ROLE_DELIVER_PRODUCTS = ref(false)
+
+const { data, error, loading, fetchData } = useApi("/v1/telegram-bot/get-user")
+
+onMounted(async () => {
+  // Запрашиваем данные при монтировании компонента
+  await fetchData({ telegram_user_id: tg?.initDataUnsafe?.user?.id })
+  ROLE_COURIER.value = data.value.data.role === 23
+  ROLE_DELIVER_PRODUCTS.value = data.value.data.role === 24
+})
 </script>
 
 <template>
-  <!--  <HomeStorageView />-->
-  <HomeClientView />
+  <HomeStorageView v-if="ROLE_COURIER" />
+  <HomeClientView v-if="ROLE_DELIVER_PRODUCTS" />
   <!--  <div class="container max-w-[calc(100%-20px)] mx-auto relative mb-32">-->
   <!--    <img class="max-w-[224px] my-5 mx-auto" src="@/assets/images/logo.svg" alt="">-->
   <!--    <div>-->

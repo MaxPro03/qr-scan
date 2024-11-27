@@ -4,7 +4,7 @@ import OrderClientView from "@/views/OrderClientView.vue"
 </script>
 
 <template>
-  <OrderClientView />
+  <!--  <OrderClientView />-->
   <!--  <OrderStorageView />-->
 </template>
 

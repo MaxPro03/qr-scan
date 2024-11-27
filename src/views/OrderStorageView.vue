@@ -2,47 +2,67 @@
 import { useRoute } from "vue-router"
 import UiProductCard from "@/components/order/UiProductCard.vue"
 import UiBadge from "@/components/order/UiBadge.vue"
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import UiInfoBlock from "@/components/order/UiInfoBlock.vue"
+import { useApi } from "@/utils/composable/useApi"
+import { useTelegram } from "@/utils/composable/useTelegram"
+
+const { tg } = useTelegram()
 
 const route = useRoute()
 
 const products = ref([
-  {
-    id: 1,
-    status: 1,
-    count: 12,
-    name: "Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг",
-    image: "/images/watch.png",
-  },
-  {
-    id: 2,
-    status: 2,
-    count: 12,
-    name: "Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг",
-    image: "/images/fan.png",
-  },
-  {
-    id: 3,
-    status: 1,
-    count: 12,
-    name: "Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг",
-    image: "/images/new-qr.png",
-  },
+  // {
+  //   id: 1,
+  //   status: 1,
+  //   count: 12,
+  //   name: "Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг",
+  //   image: "/images/watch.png",
+  // },
+  // {
+  //   id: 2,
+  //   status: 2,
+  //   count: 12,
+  //   name: "Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг",
+  //   image: "/images/fan.png",
+  // },
+  // {
+  //   id: 3,
+  //   status: 1,
+  //   count: 12,
+  //   name: "Кофе в зернах Lavazza Crema e Aroma Espresso, 1 кг",
+  //   image: "/images/new-qr.png",
+  // },
 ])
 
-const infoBlocks = ref([
-  {
-    id: 1,
-    name: "Apple Store Malika B29",
-    description: "Ташкент, Юнусабад-14, д.30 кв. 28, этаж 2",
-  },
-  {
-    id: 2,
-    name: "Technoshop Market",
-    description: "Ташкент, Юнусабад-14, д.30 кв. 28, этаж 2",
-  },
-])
+const store = ref({})
+
+// const infoBlocks = ref([
+//   {
+//     id: 1,
+//     name: "Apple Store Malika B29",
+//     description: "Ташкент, Юнусабад-14, д.30 кв. 28, этаж 2",
+//   },
+//   {
+//     id: 2,
+//     name: "Technoshop Market",
+//     description: "Ташкент, Юнусабад-14, д.30 кв. 28, этаж 2",
+//   },
+// ])
+
+const { data, error, loading, fetchData } = useApi(
+  "/v1/telegram-bot/get-store-products",
+)
+
+onMounted(async () => {
+  // Запрашиваем данные при монтировании компонента
+  await fetchData({
+    telegram_user_id: tg?.initDataUnsafe?.user?.id,
+    store_id: route.params.id,
+  })
+  products.value = data.value.data.products
+  store.value = data.value.data.store
+})
 </script>
 
 <template>
@@ -72,11 +92,7 @@ const infoBlocks = ref([
         </div>
       </div>
       <div class="grid gap-[5px] mt-2.5">
-        <UiInfoBlock
-          v-for="item in infoBlocks"
-          :key="item.id"
-          :info="item"
-        ></UiInfoBlock>
+        <UiInfoBlock :info="store"></UiInfoBlock>
       </div>
     </div>
     <div class="qr-scan-button-container">

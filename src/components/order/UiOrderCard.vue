@@ -15,6 +15,8 @@ const statusColor = (status) => {
       return "green"
     case 4:
       return "yellow"
+    case 6:
+      return "yellow"
     default:
       return "blue"
   }
@@ -30,6 +32,8 @@ const badgeTitle = (status) => {
       return "Принят на доставку"
     case 4:
       return "Готов в отправке"
+    case 6:
+      return "Готов в отправке"
     default:
       return ""
   }
@@ -41,13 +45,13 @@ const badgeTitle = (status) => {
     class="rounded-2xl bg-white p-4 flex gap-3 justify-between items-center cursor-pointer"
   >
     <div class="grid gap-3">
-      <span class="font-medium text-lg"># {{ orderInfo.number }}</span>
+      <span class="font-medium text-lg">{{ orderInfo.store_name }}</span>
       <div class="flex items-center gap-[10px]">
-        <UiBadge :color="statusColor(orderInfo.status)"
-          >{{ badgeTitle(orderInfo.status) }}
-        </UiBadge>
+        <!--        <UiBadge :color="statusColor(orderInfo.status)"-->
+        <!--          >{{ badgeTitle(orderInfo.status) }}-->
+        <!--        </UiBadge>-->
         <span class="text-[#707579] text-xs"
-          >Товары: {{ orderInfo.count }}</span
+          >Товары: {{ orderInfo.total_order_items }}</span
         >
       </div>
     </div>
