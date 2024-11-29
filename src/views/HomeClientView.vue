@@ -30,9 +30,7 @@ const filteredItems = computed(() => {
 
 const orders = ref([])
 
-const { data, error, loading, fetchData } = useApi(
-  "/v1/telegram-bot/get-orders",
-)
+const { data, error, loading, fetchData } = useApi("/telegram-bot/get-orders")
 
 onMounted(async () => {
   // Запрашиваем данные при монтировании компонента

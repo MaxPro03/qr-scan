@@ -2,6 +2,9 @@
 import { QrcodeStream } from "vue-qrcode-reader"
 import { onMounted, ref } from "vue"
 import UiBadge from "@/components/order/UiBadge.vue"
+import { useTelegram } from "@/utils/composable/useTelegram"
+
+const { tg } = useTelegram()
 
 const modalContent = ref()
 const showModal = ref(false)
@@ -17,11 +20,11 @@ const result = ref(null)
 const errorMessage = ref("")
 const loading = ref(false)
 
-const selectedConstraints = ref({ facingMode: "environment" })
+const selectedConstraints = ref({ facingMode: "user" })
 const cameraFacingMode = ref("environment") // По умолчанию используем заднюю камеру
 const defaultConstraintOptions = [
   { label: "rear camera", constraints: { facingMode: "environment" } },
-  // { label: "front camera", constraints: { facingMode: "user" } },
+  { label: "front camera", constraints: { facingMode: "user" } },
 ]
 const constraintOptions = ref(defaultConstraintOptions)
 const torchActive = ref(false)
@@ -77,7 +80,7 @@ const sendPostRequest = async (id) => {
 
   try {
     const response = await fetch(
-      `https://admin.gogomarket.uz/api/v2/order/confirm-order-delivery?id=${id}`,
+      `https://admin.gogomarket.uz/api/v2/telegram-bot/scan-product-barcode?telegram_user_id=${tg?.initDataUnsafe?.user?.id}&barcode=${id}`,
       {
         method: "POST",
         headers: {

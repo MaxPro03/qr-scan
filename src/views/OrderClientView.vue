@@ -29,7 +29,7 @@ const openGoogleMaps = () => {
 }
 
 const { data, error, loading, fetchData } = useApi(
-  "/v1/telegram-bot/get-order-details",
+  "/telegram-bot/get-order-details",
 )
 
 onMounted(async () => {
@@ -100,7 +100,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="qr-scan-button-container">
-      <RouterLink class="qr-scan-button" to="/qr-scan">
+      <RouterLink class="qr-scan-button" to="/client-qr-scan">
         <img src="@/assets/images/qr-scan.svg" alt="" />
         <span class="font-medium text-lg">Передать заказ клиенту</span>
       </RouterLink>

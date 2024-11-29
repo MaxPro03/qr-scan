@@ -51,7 +51,7 @@ const store = ref({})
 // ])
 
 const { data, error, loading, fetchData } = useApi(
-  "/v1/telegram-bot/get-store-products",
+  "/telegram-bot/get-store-products",
 )
 
 onMounted(async () => {
@@ -96,7 +96,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="qr-scan-button-container">
-      <RouterLink class="qr-scan-button" to="/qr-scan">
+      <RouterLink class="qr-scan-button" to="/storage-qr-scan">
         <img src="@/assets/images/qr-scan.svg" alt="" />
         <span class="font-medium text-lg">Принят товар</span>
       </RouterLink>

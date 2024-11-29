@@ -39,9 +39,7 @@ const orders = ref([
   // },
 ])
 
-const { data, error, loading, fetchData } = useApi(
-  "/v1/telegram-bot/get-stores",
-)
+const { data, error, loading, fetchData } = useApi("/telegram-bot/get-stores")
 
 onMounted(async () => {
   // Запрашиваем данные при монтировании компонента
@@ -78,7 +76,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="qr-scan-button-container">
-      <RouterLink class="qr-scan-button" to="/qr-scan">
+      <RouterLink class="qr-scan-button" to="/storage-qr-scan">
         <img src="@/assets/images/qr-scan.svg" alt="" />
         <span class="font-medium text-lg">Принят товар</span>
       </RouterLink>

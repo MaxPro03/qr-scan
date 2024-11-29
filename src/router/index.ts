@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router"
 import HomeView from "@/views/HomeView.vue"
 import OrderView from "@/views/OrderView.vue"
-import QrScanView from "@/views/QrScanView.vue"
+// import QrScanView from "@/views/QrScanView.vue"
 import OrderClientView from "@/views/OrderClientView.vue"
 import OrderStorageView from "@/views/OrderStorageView.vue"
+import QrScanClientView from "@/views/QrScanClientView.vue"
+import QrScanStorageView from "@/views/QrScanStorageView.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,9 +26,14 @@ const router = createRouter({
       component: OrderStorageView,
     },
     {
-      path: "/qr-scan",
-      name: "qrScan",
-      component: QrScanView,
+      path: "/storage-qr-scan",
+      name: "qrScanStorage",
+      component: QrScanStorageView,
+    },
+    {
+      path: "/client-qr-scan",
+      name: "qrScanClient",
+      component: QrScanClientView,
     },
   ],
 })

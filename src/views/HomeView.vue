@@ -51,13 +51,28 @@ const ROLE_COURIER = ref(false)
 //    Доставщик - доставляет товары клиентам
 const ROLE_DELIVER_PRODUCTS = ref(false)
 
-const { data, error, loading, fetchData } = useApi("/v1/telegram-bot/get-user")
+const { data, error, loading, fetchData } = useApi("/telegram-bot/get-user")
 
 onMounted(async () => {
-  // Запрашиваем данные при монтировании компонента
+  // Проверяем, доступен ли Telegram WebApp
+  // if (tg) {
+  //   // Если Telegram WebApp доступен, подписываемся на событие готовности
+  //   tg.onEvent("ready", () => {
+  //     console.log("Telegram WebApp is ready!")
+  //   })
+  //
+  //   // Проверяем, готово ли приложение сразу, если оно уже инициализировалось
+  //   if (tg.isReady) {
+  //     // Запрашиваем данные при монтировании компонента
+  //     await fetchData({ telegram_user_id: tg?.initDataUnsafe?.user?.id })
+  //     ROLE_COURIER.value = data.value.data.role === 23
+  //     ROLE_DELIVER_PRODUCTS.value = data.value.data.role === 24
+  //     console.log("Telegram WebApp is already ready!")
+  //   }
+  // }
   await fetchData({ telegram_user_id: tg?.initDataUnsafe?.user?.id })
-  ROLE_COURIER.value = data.value.data.role === 23
-  ROLE_DELIVER_PRODUCTS.value = data.value.data.role === 24
+  ROLE_COURIER.value = data.value?.data?.role === 23
+  ROLE_DELIVER_PRODUCTS.value = data.value?.data?.role === 24
 })
 </script>
 
